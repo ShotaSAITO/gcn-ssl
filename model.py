@@ -5,32 +5,31 @@ import time
 
 class GCN:
 
-    def gcn_layer(self, H, A_tilde, num_nodes, output_dim, scope):
-        with tf.variable_scope(scope):
-            W = tf.Variable(tf.random_uniform((num_nodes, output_dim)))
-            Z = tf.matmul(tf.matmul(A_tilde, H), W)
-            H_out = tf.nn.relu(Z)
-    
-        return H_out
+    def get_tf_objects(self, labels):
+        num_points = len(labels)
+        adj = tf.placeholder(tf.float32, shape=(num_points, num_points))
+        deg = tf.placeholder(tf.float32, shape=(num_points, num_points))
 
+        return adj, deg
+        
 
     def gcn(self, A, D, k):
         num_nodes = A.get_shape()[0].value
         num_classes = k  
         id = tf.eye(num_nodes)
-        A_tilde = self.compute_filter(A,D)
+        A_tilde = self._compute_filter(A,D)
 
         H_0 = id  # initial hidden state
     
-        H_1 = self.gcn_layer(H_0, A_tilde, num_nodes, num_nodes, "L1")
-        H_2 = self.gcn_layer(H_1, A_tilde, num_nodes, num_nodes, "L2")
-        H_3 = self.gcn_layer(H_2, A_tilde, num_nodes, num_classes, "L3")
+        H_1 = self._gcn_layer(H_0, A_tilde, num_nodes, num_nodes, "L1")
+        H_2 = self._gcn_layer(H_1, A_tilde, num_nodes, num_nodes, "L2")
+        H_3 = self._gcn_layer(H_2, A_tilde, num_nodes, num_classes, "L3")
         y = H_3
     
         return H_2, y
 
 
-    def compute_filter(self, A, D):
+    def _compute_filter(self, A, D):
         num_nodes = A.get_shape()[0].value
         id = tf.eye(num_nodes)
         A = A + id
@@ -43,14 +42,24 @@ class GCN:
         return A_tilde
 
 
-    def get_loss(self, pred, labels, train_masks):    
-        tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred, labels=labels)
+    def _gcn_layer(self, H, A_tilde, num_nodes, output_dim, scope):
+        with tf.variable_scope(scope):
+            W = tf.Variable(tf.random_uniform((num_nodes, output_dim)))
+            Z = tf.matmul(tf.matmul(A_tilde, H), W)
+            H_out = tf.nn.relu(Z)
+    
+        return H_out
+
+
+    def get_loss(self, pred, labels, train_mask):    
+        loss = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred, labels=labels)
         mask = tf.cast(train_mask, dtype=tf.float32)
         mask /= tf.reduce_mean(mask)
         loss *= mask
         loss = tf.reduce_mean(loss)
 
         return loss
+
 
     def acc_measure(self, a, labels):
         num_points = labels.shape[0]
