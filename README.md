@@ -1,10 +1,10 @@
 # gcn-ssl
 Implementation of GCN and regularization graph Semi-supervised learning.
 
-# Graph CNN based SSL
+## Graph CNN based SSL
 The implementation of [1].
 
-# Graph Regilarization based SSL
+## Graph Regilarization based SSL
 The implementation of [2].
 
 # Data
