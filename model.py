@@ -6,7 +6,6 @@ import time
 class GCN:
 
     def gcn_layer(self, H, A_tilde, num_nodes, output_dim, scope):
-        
         with tf.variable_scope(scope):
             W = tf.Variable(tf.random_uniform((num_nodes, output_dim)))
             Z = tf.matmul(tf.matmul(A_tilde, H), W)
@@ -16,7 +15,6 @@ class GCN:
 
 
     def gcn(self, A, D, k):
-    
         num_nodes = A.get_shape()[0].value
         num_classes = k  
         id = tf.eye(num_nodes)
@@ -45,9 +43,26 @@ class GCN:
         return A_tilde
 
 
+    def get_loss(self, pred, labels, train_masks):    
+        tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred, labels=labels)
+        mask = tf.cast(train_mask, dtype=tf.float32)
+        mask /= tf.reduce_mean(mask)
+        loss *= mask
+        loss = tf.reduce_mean(loss)
+
+        return loss
+
+    def acc_measure(self, a, labels):
+        num_points = labels.shape[0]
+        b = np.argmax(a, 1)
+        acc = np.sum(labels == b)/num_points
+
+        return acc
+
+
 class GraphSSL:
 
-    def graph_SSL(self, A,D,Y,alpha):
+    def graph_SSL(self, A, D, Y, alpha):
         num_nodes = A.shape[0]  # number of nodes in the graph, number of points
         D_sq = np.sqrt(D)
         D_sq_inv = np.diag(1/np.diagonal(D))
@@ -62,7 +77,7 @@ class GraphSSL:
         return F
     
     
-    def load_Y(self, labels,train_masks):
+    def load_Y(self, labels, train_masks):
         num_nodes = labels.shape[0]
         k = max(labels) + 1
         Y = np.zeros((num_nodes, k))
@@ -71,10 +86,9 @@ class GraphSSL:
         return Y
     
     
-    def acc_measure(self, F,labels):
+    def acc_measure(self, F, labels):
         num_points = labels.shape[0]
         b = np.argmax(F, axis=1)
-        correct = 0
-        correct = np.sum(labels == b)/num_points
+        acc = np.sum(labels == b)/num_points
     
-        return correct
+        return acc

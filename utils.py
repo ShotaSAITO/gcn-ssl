@@ -32,28 +32,6 @@ def load_eu_core_true_label():
     return labels, num_clusters
 
 
-def load_karate_matrices():
-    G = nx.karate_club_graph()
-
-    A = nx.adjacency_matrix(G)
-    L = nx.laplacian_matrix(G)
-    D = L + A
-
-    A = A.toarray()
-    D = D.toarray()
-
-    return A, D
-
-
-def load_karate_true_label():
-    
-    labels = [0, 0, 0, 0, 1, 1, 1, 0, 2, 0, 1, 0, 0, 0, 2, 2, 1, 0, 2, 0, 2, 0, 2, 3, 3, 3, 2, 3, 3, 2, 2, 3, 2, 2]
-    labels = np.array(labels)
-    labels = labels.astype('int32')
-    num_clusters = int(max(labels) + 1)
-    return labels, num_clusters
-
-
 def choose_mask(labels,k,proportion):
     num_nodes = labels.shape[0]
     
