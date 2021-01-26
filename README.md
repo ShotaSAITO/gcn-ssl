@@ -4,10 +4,10 @@ Implementation of GCN and regularization graph Semi-supervised learning.
 ## Implemetations
 
 ### Graph CNN based SSL
-SSL based on neural network with multiple layers of graph CNNs. The implementation of [1].
+This is an implemntaion of semi-supervised learning via neural network with multiple layers of graph CNNs. The implementation of [1].
 
 ### Graph Regularization based SSL
-To compare with Graph CNN based SSL, the regularization method [2] is the classic. The implementation of [2].
+To compare with Graph CNN based SSL, the regularization method [2] is a suitablly clasical one. The implementation of [2].
 
 ## Data
 You need to download the [Email-eu-core](https://snap.stanford.edu/data/email-Eu-core.html) dataset from [SNAP](https://snap.stanford.edu/index.html) in the same directory.
